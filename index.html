@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PhishGuard AI | Security Center</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #080f1d;
+    color: #e2e8f0;
+}
+
+/* Main Layout */
+
+.dashboard {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar */
+
+.sidebar {
+    width: 235px;
+    background: #0c1728;
+    border-right: 1px solid #1e3048;
+    padding: 25px 16px;
+    flex-shrink: 0;
+}
+
+.logo {
+    font-size: 22px;
+    font-weight: bold;
+    color: white;
+    padding: 5px 10px 30px;
+}
+
+.logo span {
+    color: #22d3ee;
+}
+
+.sidebar-label {
+    color: #64748b;
+    font-size: 11px;
+    letter-spacing: 2px;
+    margin: 20px 10px 12px;
+}
+
+.nav-item {
+    display: block;
+    padding: 13px 12px;
+    color: #9fb2ca;
+    text-decoration: none;
+    border-radius: 8px;
+    margin-bottom: 7px;
+    font-size: 14px;
+}
+
+.nav-item:hover,
+.nav-item.active {
+    background: #12314b;
+    color: #38bdf8;
+}
+
+.sidebar-status {
+    margin-top: 45px;
+    padding: 14px;
+    background: #102a30;
+    border: 1px solid #155e55;
+    border-radius: 10px;
+    font-size: 12px;
+    color: #86efac;
+}
+
+/* Main Content */
+
+.main {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Top Bar */
+
+.topbar {
+    min-height: 75px;
+    background: #0c1728;
+    border-bottom: 1px solid #1e3048;
+    padding: 18px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+
+.topbar h2 {
+    font-size: 20px;
+    color: white;
+}
+
+.system-status {
+    color: #4ade80;
+    font-size: 12px;
+    background: #102b25;
+    padding: 9px 13px;
+    border-radius: 20px;
+}
+
+/* Page Content */
+
+.content {
+    padding: 25px 30px;
+    max-width: 1500px;
+    margin: auto;
+}
+
+.welcome {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 25px;
+}
+
+.welcome h1 {
+    font-size: 25px;
+    color: white;
+    margin-bottom: 8px;
+}
+
+.welcome p {
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+.date-label {
+    color: #38bdf8;
+    font-size: 12px;
+    background: #10243c;
+    padding: 10px 14px;
+    border-radius: 8px;
+}
+
+/* Statistics */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin-bottom: 22px;
+}
+
+.stat-card {
+    background: #111f33;
+    border: 1px solid #203650;
+    border-radius: 12px;
+    padding: 19px;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card:hover {
+    border-color: #1685ad;
+}
+
+.stat-icon {
+    font-size: 22px;
+    margin-bottom: 13px;
+}
+
+.stat-card h3 {
+    font-size: 12px;
+    color: #94a3b8;
+    font-weight: normal;
+}
+
+.stat-card h2 {
+    font-size: 29px;
+    margin-top: 9px;
+    color: #38bdf8;
+}
+
+.stat-card:nth-child(3) h2 {
+    color: #fb7185;
+}
+
+.stat-card:nth-child(4) h2 {
+    color: #fbbf24;
+}
+
+/* Section Heading */
+
+.section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 25px 0 14px;
+}
+
+.section-heading h2 {
+    font-size: 17px;
+    color: white;
+}
+
+.section-heading span {
+    font-size: 11px;
+    color: #64748b;
+}
+
+/* Analytics */
+
+.analytics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.panel {
+    background: #111f33;
+    border: 1px solid #203650;
+    border-radius: 12px;
+    padding: 20px;
+    min-width: 0;
+}
+
+.panel h3 {
+    font-size: 15px;
+    color: #e2e8f0;
+    margin-bottom: 7px;
+}
+
+.panel p {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.chart-box {
+    position: relative;
+    height: 210px;
+    margin-top: 15px;
+}
+
+/* Scanning Tools */
+
+.scanner-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.scanner-card {
+    background: #111f33;
+    border: 1px solid #203650;
+    border-radius: 12px;
+    padding: 22px;
+    min-width: 0;
+}
+
+.scanner-card h3 {
+    color: white;
+    font-size: 17px;
+    margin-bottom: 8px;
+}
+
+.scanner-card .description {
+    color: #94a3b8;
+    font-size: 12px;
+    margin-bottom: 18px;
+}
+
+textarea,
+input {
+    width: 100%;
+    padding: 13px;
+    background: #091526;
+    color: white;
+    border: 1px solid #29415c;
+    border-radius: 8px;
+    font-size: 13px;
+    outline: none;
+    margin-bottom: 12px;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 110px;
+}
+
+textarea:focus,
+input:focus {
+    border-color: #22d3ee;
+    box-shadow: 0 0 0 2px #22d3ee20;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(100deg, #0878c9, #0891b2);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+button:hover {
+    filter: brightness(1.2);
+}
+
+.result-box {
+    margin-top: 15px;
+    padding: 13px;
+    background: #091526;
+    border: 1px solid #29415c;
+    border-left: 4px solid #22d3ee;
+    border-radius: 8px;
+    font-size: 13px;
+    overflow-wrap: anywhere;
+    line-height: 1.7;
+    display: none;
+}
+
+.result-box h3 {
+    font-size: 14px;
+    margin-bottom: 7px;
+}
+
+.result-box p {
+    color: #b8c8dc;
+    margin-top: 6px;
+}
+
+/* Footer */
+
+footer {
+    text-align: center;
+    padding: 20px;
+    color: #64748b;
+    font-size: 12px;
+    border-top: 1px solid #1e3048;
+    margin-top: 30px;
+}
+
+/* Responsive */
+
+@media(max-width: 950px) {
+    .sidebar {
+        width: 190px;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media(max-width: 650px) {
+    .dashboard {
+        display: block;
+    }
+
+    .sidebar {
+        width: 100%;
+        padding: 13px;
+        border-right: none;
+        border-bottom: 1px solid #1e3048;
+    }
+
+    .logo {
+        padding: 5px 5px 12px;
+    }
+
+    .sidebar-label,
+    .sidebar-status {
+        display: none;
+    }
+
+    .nav-item {
+        display: inline-block;
+        padding: 9px;
+        font-size: 12px;
+        margin: 2px;
+    }
+
+    .topbar {
+        padding: 15px;
+    }
+
+    .content {
+        padding: 18px 13px;
+    }
+
+    .welcome h1 {
+        font-size: 21px;
+    }
+
+    .stats-grid {
+        gap: 10px;
+    }
+
+    .stat-card {
+        padding: 14px;
+    }
+
+    .stat-card h2 {
+        font-size: 24px;
+    }
+
+    .analytics-grid,
+    .scanner-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .chart-box {
+        height: 190px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="dashboard">
+
+<!-- SIDEBAR -->
+
+<aside class="sidebar">
+
+    <div class="logo">🛡️ PhishGuard <span>AI</span></div>
+
+    <p class="sidebar-label">MAIN MENU</p>
+
+    <a href="/" class="nav-item active">▦ Dashboard</a>
+    <a href="#emailScanner" class="nav-item">✉️ Email Scanner</a>
+    <a href="#urlScanner" class="nav-item">↗️ URL Scanner</a>
+    <a href="/history" class="nav-item">◷ Detection History</a>
+
+    <p class="sidebar-label">SYSTEM</p>
+
+    <div class="sidebar-status">
+        ● Security Monitoring<br><br>
+        Protection Dashboard Active
+    </div>
+
+</aside>
+
+<!-- MAIN AREA -->
+
+<main class="main">
+
+    <header class="topbar">
+        <h2>Security Operations Center</h2>
+        <div class="system-status">● System Online</div>
+    </header>
+
+    <div class="content">
+
+        <!-- Welcome -->
+
+        <section class="welcome">
+            <div>
+                <h1>AI Security Overview</h1>
+                <p>Monitor phishing emails and suspicious website links.</p>
+            </div>
+
+            <div class="date-label">🛡️ PhishGuard Threat Monitor</div>
+        </section>
+
+        <!-- Statistics -->
+
+        <section class="stats-grid">
+
+            <div class="stat-card">
+                <div class="stat-icon">✉️</div>
+                <h3>Total Emails Checked</h3>
+                <h2 id="totalEmails">0</h2>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">🌐</div>
+                <h3>Total URLs Checked</h3>
+                <h2 id="totalUrls">0</h2>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">⚠️</div>
+                <h3>Phishing Emails</h3>
+                <h2 id="phishingEmails">0</h2>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">🚨</div>
+                <h3>Suspicious URLs</h3>
+                <h2 id="suspiciousUrls">0</h2>
+            </div>
+
+        </section>
+
+        <!-- Analytics -->
+
+        <div class="section-heading">
+            <h2>Detection Analytics</h2>
+            <span>BASED ON STORED DETECTIONS</span>
+        </div>
+
+        <section class="analytics-grid">
+
+            <div class="panel">
+                <h3>Email Security Analysis</h3>
+                <p>Phishing vs legitimate emails</p>
+
+                <div class="chart-box">
+                    <canvas id="emailChart"></canvas>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h3>URL Security Analysis</h3>
+                <p>Suspicious vs low-risk URLs</p>
+
+                <div class="chart-box">
+                    <canvas id="urlChart"></canvas>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Scanning Tools -->
+
+        <div class="section-heading">
+            <h2>AI Threat Detection Tools</h2>
+            <span>SCAN EMAILS AND URLS</span>
+        </div>
+
+        <section class="scanner-grid">
+
+            <div class="scanner-card" id="emailScanner">
+
+                <h3>✉️ Email Security Scanner</h3>
+
+                <p class="description">
+                    Analyse an email message for phishing indicators.
+                </p>
+
+                <textarea id="email"
+                    placeholder="Paste your email message here..."></textarea>
+
+                <button onclick="checkEmail()">
+                    🔍 Analyse Email
+                </button>
+
+                <div id="emailResult" class="result-box"></div>
+
+            </div>
+
+            <div class="scanner-card" id="urlScanner">
+
+                <h3>🌐 Website URL Scanner</h3>
+
+                <p class="description">
+                    Check a website address for suspicious warning signs.
+                </p>
+
+                <input type="text" id="url"
+                    placeholder="Enter website URL...">
+
+                <button onclick="checkURL()">
+                    🔍 Analyse URL
+                </button>
+
+                <div id="urlResult" class="result-box"></div>
+
+            </div>
+
+        </section>
+
+    </div>
+
+    <footer>
+        © 2026 PhishGuard AI | AI-Powered Cybersecurity Monitoring
+    </footer>
+
+</main>
+</div>
+
+<script>
+
+// Load Dashboard Statistics
+
+async function loadStats() {
+    try {
+        const response = await fetch("/stats");
+        const data = await response.json();
+
+        document.getElementById("totalEmails").innerText =
+            data.total_emails;
+
+        document.getElementById("totalUrls").innerText =
+            data.total_urls;
+
+        document.getElementById("phishingEmails").innerText =
+            data.phishing_emails;
+
+        document.getElementById("suspiciousUrls").innerText =
+            data.suspicious_urls;
+
+    } catch (error) {
+        console.log("Unable to load statistics", error);
+    }
+}
+
+// Email Chart
+
+async function loadChart() {
+    try {
+        const response = await fetch("/stats");
+        const data = await response.json();
+
+        const canvas = document.getElementById("emailChart");
+
+        if (Chart.getChart(canvas)) {
+            Chart.getChart(canvas).destroy();
+        }
+
+        new Chart(canvas, {
+            type: "doughnut",
+            data: {
+                labels: ["Phishing Emails", "Legitimate Emails"],
+                datasets: [{
+                    data: [
+                        data.phishing_emails,
+                        data.legitimate_emails
+                    ],
+                    backgroundColor: ["#fb7185", "#34d399"],
+                    borderColor: "#111f33",
+                    borderWidth: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: "bottom",
+                        labels: {
+                            color: "#cbd5e1",
+                            padding: 18
+                        }
+                    }
+                }
+            }
+        });
+
+    } catch (error) {
+        console.log("Email chart error", error);
+    }
+}
+
+// URL Chart
+
+async function loadUrlChart() {
+    try {
+        const response = await fetch("/stats");
+        const data = await response.json();
+
+        const canvas = document.getElementById("urlChart");
+
+        if (Chart.getChart(canvas)) {
+            Chart.getChart(canvas).destroy();
+        }
+
+        new Chart(canvas, {
+            type: "doughnut",
+            data: {
+                labels: ["Suspicious URLs", "Low-risk URLs"],
+                datasets: [{
+                    data: [
+                        data.suspicious_urls,
+                        Math.max(0, data.total_urls - data.suspicious_urls)
+                    ],
+                    backgroundColor: ["#fb7185", "#34d399"],
+                    borderColor: "#111f33",
+                    borderWidth: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: "bottom",
+                        labels: {
+                            color: "#cbd5e1",
+                            padding: 18
+                        }
+                    }
+                }
+            }
+        });
+
+    } catch (error) {
+        console.log("URL chart error", error);
+    }
+}
+
+// Security Alert
+
+function showSecurityAlert(message) {
+    alert("🛡️ PHISHGUARD AI SECURITY ALERT!\n\n" + message);
+}
+
+// Display Result
+
+function displayResult(resultBox, data, threat) {
+
+    resultBox.style.display = "block";
+
+    resultBox.innerHTML = `
+        <h3>${data.result}</h3>
+        <strong>Threat Level: ${threat}</strong>
+        <br>
+        <strong>Risk Score: ${data.risk_score}/100</strong>
+        <p>${data.explanation || "Analysis completed."}</p>
+    `;
+
+    resultBox.style.borderLeftColor =
+        threat === "HIGH" ? "#fb7185" :
+        threat === "MEDIUM" ? "#fbbf24" : "#34d399";
+
+    resultBox.style.color =
+        threat === "HIGH" ? "#fda4af" :
+        threat === "MEDIUM" ? "#fcd34d" : "#86efac";
+}
+
+// Check Email
+
+async function checkEmail() {
+
+    const email = document.getElementById("email").value;
+    const resultBox = document.getElementById("emailResult");
+
+    if (!email.trim()) {
+        resultBox.style.display = "block";
+        resultBox.innerText = "Please enter an email message.";
+        return;
+    }
+
+    resultBox.style.display = "block";
+    resultBox.innerText = "Analysing email...";
+
+    try {
+        const response = await fetch("/check-email", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ email: email })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            resultBox.innerText = data.result || "Detection failed.";
+            return;
+        }
+
+        const threat = (data.threat_level || "Low").toUpperCase();
+
+        displayResult(resultBox, data, threat);
+
+        await loadStats();
+        await loadChart();
+
+        if (threat === "HIGH" || threat === "MEDIUM") {
+            showSecurityAlert(threat + " threat email detected!");
+        }
+
+    } catch (error) {
+        resultBox.innerText = "Unable to connect to the server.";
+        console.error(error);
+    }
+}
+
+// Check URL
+
+async function checkURL() {
+
+    const url = document.getElementById("url").value;
+    const resultBox = document.getElementById("urlResult");
+
+    if (!url.trim()) {
+        resultBox.style.display = "block";
+        resultBox.innerText = "Please enter a website URL.";
+        return;
+    }
+
+    resultBox.style.display = "block";
+    resultBox.innerText = "Analysing URL...";
+
+    try {
+        const response = await fetch("/check-url", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ url: url })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            resultBox.innerText = data.result || "Detection failed.";
+            return;
+        }
+
+        const threat = (data.threat_level || "Low").toUpperCase();
+
+        displayResult(resultBox, data, threat);
+
+        await loadStats();
+        await loadUrlChart();
+
+        if (threat === "HIGH" || threat === "MEDIUM") {
+            showSecurityAlert(threat + " threat website URL detected!");
+        }
+
+    } catch (error) {
+        resultBox.innerText = "Unable to connect to the server.";
+        console.error(error);
+    }
+}
+
+// Load dashboard when page opens
+
+document.addEventListener("DOMContentLoaded", function() {
+    loadStats();
+    loadChart();
+    loadUrlChart();
+});
+
+</script>
+
+</body>
+</html>
